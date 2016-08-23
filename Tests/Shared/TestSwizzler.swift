@@ -4,24 +4,12 @@ import Sugar
 
 class Swizzled: NSObject {
 
-  override class func initialize() {
-    struct Static {
-      static var token: dispatch_once_t = 0
-    }
-
-    if self !== Swizzled.self {
-      return
-    }
-
-    dispatch_once(&Static.token) {
-      Swizzler.swizzle("method", cls: self)
-    }
-  }
-
   dynamic func method() -> Bool {
     return true
   }
+}
 
+extension Swizzled {
   func swizzled_method() -> Bool {
     return false
   }
@@ -30,6 +18,7 @@ class Swizzled: NSObject {
 class SwizzleTests: XCTestCase {
 
   func testSwizzleInstanceMethod() {
+    Swizzler.swizzle("method", cls: Swizzled.self)
     let object = Swizzled()
     XCTAssertFalse(object.method())
   }
